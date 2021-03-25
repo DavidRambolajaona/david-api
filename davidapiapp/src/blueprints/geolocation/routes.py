@@ -32,8 +32,8 @@ def getDriver():
     binary_location_chrome = os.environ.get("GOOGLE_CHROME_BIN")
     if binary_location_chrome is not None :
         # This is in production
-        options.add_argument("--headless")
-        options.add_argument('--disable-gpu')
+        # options.add_argument("--headless")
+        # options.add_argument('--disable-gpu')
         options.binary_location = binary_location_chrome
     executable_path_chrome = os.environ.get("CHROMEDRIVER_PATH")
     if executable_path_chrome is None :
