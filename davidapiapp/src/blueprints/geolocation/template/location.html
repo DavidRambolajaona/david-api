@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Location</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+
+    <style>
+        html, body {
+          height: 100%;
+          width: 100%;
+          margin: 0;
+          padding: 0;
+        }
+
+        #data-info {
+            height: 20%;
+        }
+
+        #data-info p {
+            padding: 0;
+            margin: 0;
+        }
+
+        .accuracy-info {
+            background-color: darkgray;
+        }
+
+        #map {
+          height: 80%;
+        }
+      </style>
+
+        <!-- <script src='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' /> -->
+</head>
+<body>
+    <div id="data-info">
+        <p>Status: <span id="status"></span></p>
+        <p id="info"></p>
+        <p>Latitude: <span id="latitude"></span></p>
+        <p>Longitude: <span id="longitude"></span></p>
+        <p>Accuracy: <span id="accuracy"></span></p>
+        <p id="gmlink"></p>
+    </div>
+    <!-- <div id="map"></div> -->
+
+    <div id='map'></div>
+    <script>
+        // mapboxgl.accessToken = 'pk.eyJ1IjoiZGF2aWRyYW1ib2xhamFvbmEiLCJhIjoiY2ttb3Vka3pnMHV4bTJucGV4bDB0YjRsdCJ9.34GcyF-xpIX9h6VWf8NXjQ';
+        // var map = new mapboxgl.Map({
+        //     container: 'map', // container id
+        //     style: 'mapbox://styles/mapbox/satellite-v9', // style URL
+        //     center: [47.5713863, -18.927065499999998], // starting position [lng, lat]
+        //     zoom: 18 // starting zoom
+        // });
+
+        // // Create a default Marker and add it to the map.
+        // var marker1 = new mapboxgl.Marker()
+        // .setLngLat([47.5713863, -18.927065499999998])
+        // .addTo(map);
+
+    </script>
+
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAR2QSX6S3Sf_O-FTtq4fjRn3VsRD4W5Jw&callback=initMap" async defer></script> -->
+    <script>
+        function initMap() {
+            new google.maps.Map(document.getElementById("map"), {
+                center: {lat: -18.926666, lng: 47.833333},
+                zoom: 16
+            });
+        }
+    </script>
+
+    <script>
+
+        function initMapbox(lng, lat) {
+            mapboxgl.accessToken = 'pk.eyJ1IjoiZGF2aWRyYW1ib2xhamFvbmEiLCJhIjoiY2ttb3Vka3pnMHV4bTJucGV4bDB0YjRsdCJ9.34GcyF-xpIX9h6VWf8NXjQ';
+            var map = new mapboxgl.Map({
+                container: 'map', // container id
+                style: 'mapbox://styles/mapbox/satellite-v9', // style URL
+                center: [lng, lat], // starting position [lng, lat]
+                zoom: 18 // starting zoom
+            });
+
+            // Create a default Marker and add it to the map.
+            var marker1 = new mapboxgl.Marker()
+            .setLngLat([lng, lat])
+            .addTo(map);
+        }
+
+        function getGoogleMapLink(lat, long) {
+            // var linkHtml = '<a href="https://www.google.com/maps/@?api=1&map_action=map&center='+lat+','+long+'&zoom=20&basemap=satellite&layer=transit" target="_blank">View on google maps</a>';
+            var linkHtml = '<a href="https://www.google.com/maps/@?api=1&map_action=map&basemap=satellite&center='+lat+','+long+'&zoom=20" target="_blank">View on google maps</a>';
+            return linkHtml;
+        }
+
+        function geoFindMe() {
+            const status = document.querySelector('#status');
+            const info = document.querySelector('#info');
+            const latitude = document.querySelector('#latitude');
+            const longitude = document.querySelector('#longitude');
+            const accuracy = document.querySelector('#accuracy');
+            const gmlink = document.querySelector('#gmlink');
+
+            info.textContent = '';
+
+            function success(position) {
+                const latitudeVal  = position.coords.latitude;
+                const longitudeVal = position.coords.longitude;
+                const accuracyVal = position.coords.accuracy;
+
+                status.textContent = '';
+
+                var accuracyInfoHtml = "<span class='accuracy-info' style='color: red;'>Very bad</span>";
+                if (accuracyVal < 20) {
+                    accuracyInfoHtml = "<span class='accuracy-info' style='color: green;'>Very good</span>";
+                }
+                else if (accuracyVal < 50) {
+                    accuracyInfoHtml = "<span class='accuracy-info' style='color: yellowgreen;'>Good</span>";
+                }
+                else if (accuracyVal < 150) {
+                    accuracyInfoHtml = "<span class='accuracy-info' style='color: yellow;'>Medium</span>";
+                }
+                else if (accuracyVal < 500) {
+                    accuracyInfoHtml = "<span class='accuracy-info' style='color: maroon;'>Bad</span>";
+                }
+
+                
+                latitude.textContent = latitudeVal;
+                longitude.textContent = longitudeVal;
+                accuracy.innerHTML = accuracyVal + " (" + accuracyInfoHtml + ")";
+                gmlink.innerHTML = getGoogleMapLink(latitudeVal, longitudeVal);
+
+                initMapbox(longitudeVal, latitudeVal);
+            }
+
+            function handleError(errCode) {
+                switch (errCode) {
+                    // PERMISSION_DENIED
+                    case 1:
+                        handlePermission();
+                        break;
+
+                    // POSITION_UNAVAILABLE
+                    case 2:
+                        info.textContent = "Try to use another browser please :(";
+                        break;
+
+                    // TIMEOUT
+                    case 3:
+                        
+                        break;
+                
+                    default:
+                        break;
+                }
+            }
+
+            function handlePermission() {
+                navigator.permissions.query({name:'geolocation'}).then(function(result) {
+                    info.textContent = result.state;
+                    if (result.state == 'granted') {
+                        
+                    } else if (result.state == 'prompt') {
+                        info.textContent = "Please allow your browser to use your position ! Refresh the page !";
+                    } else if (result.state == 'denied') {
+                        info.textContent = "Please allow your browser to use your position ! :'(";
+                    }
+                });
+            }
+
+            function error(err) {
+                status.textContent = 'Unable to retrieve your location. Error code : ' + err.code;
+                handleError(err.code);
+            }
+
+            if(!navigator.geolocation) {
+                status.textContent = 'Geolocation is not supported by your browser';
+            } else {
+                status.textContent = 'Locating…';
+                navigator.geolocation.getCurrentPosition(success, error);
+            }
+
+        }
+
+        geoFindMe();
+    </script>
+</body>
+</html>

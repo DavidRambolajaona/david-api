@@ -23,6 +23,10 @@ def getLocationApi() :
     driver.quit()    
     return jsonify({"geocoding": {"longitude": longitude, "latitude": latitude}})
 
+@geolocation_bp.route('/geolocation/location')
+def location() :
+    return render_template("location.html")
+
 def getDriver():
     # Configuring options
     options = Options()
