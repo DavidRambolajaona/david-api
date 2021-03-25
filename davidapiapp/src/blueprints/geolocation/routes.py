@@ -30,12 +30,14 @@ def getDriver():
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--no-sandbox")
     binary_location_chrome = os.environ.get("GOOGLE_CHROME_BIN")
+    print("binary location chrome : " + str(binary_location_chrome))
     if binary_location_chrome is not None :
         # This is in production
         options.add_argument("--headless")
         options.add_argument('--disable-gpu')
         options.binary_location = binary_location_chrome
     executable_path_chrome = os.environ.get("CHROMEDRIVER_PATH")
+    print("exec path chrome : " + str(executable_path_chrome))
     if executable_path_chrome is None :
         dir_path = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")
         executable_path_chrome = dir_path + "/chromedriver.exe"
