@@ -66,12 +66,30 @@
 
     </script>
 
-    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAR2QSX6S3Sf_O-FTtq4fjRn3VsRD4W5Jw&callback=initMap" async defer></script> -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAR2QSX6S3Sf_O-FTtq4fjRn3VsRD4W5Jw&callback=geoFindMe" async defer></script>
     <script>
-        function initMap() {
-            new google.maps.Map(document.getElementById("map"), {
-                center: {lat: -18.926666, lng: 47.833333},
-                zoom: 16
+        function initMap(lngVal, latVal) {
+            // new google.maps.Map(document.getElementById("map"), {
+            //     center: {lat: latVal, lng: lngVal},
+            //     zoom: 16,
+            //     mapTypeId: google.maps.MapTypeId.HYBRID
+            // });
+
+            const myLatLng = { lat: latVal, lng: lngVal };
+
+            const map = new google.maps.Map(
+                document.getElementById("map"),
+                {
+                    zoom: 18,
+                    center: myLatLng,
+                    mapTypeId: google.maps.MapTypeId.HYBRID
+                }
+            );
+
+            new google.maps.Marker({
+                position: myLatLng,
+                map,
+                title: "Your location",
             });
         }
     </script>
@@ -136,7 +154,8 @@
                 accuracy.innerHTML = accuracyVal + " (" + accuracyInfoHtml + ")";
                 gmlink.innerHTML = getGoogleMapLink(latitudeVal, longitudeVal);
 
-                initMapbox(longitudeVal, latitudeVal);
+                // initMapbox(longitudeVal, latitudeVal);
+                initMap(longitudeVal, latitudeVal);
             }
 
             function handleError(errCode) {
@@ -188,7 +207,7 @@
 
         }
 
-        geoFindMe();
+        // geoFindMe();
     </script>
 </body>
 </html>
